@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import ChallengeFormSection from '../components/challenge/ChallengeFormSection'
@@ -29,15 +29,6 @@ type ChallengeErrors = Partial<Record<keyof ChallengeForm, string>>
 const isValidDateParam = (value: string | null): value is string =>
   typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
 
-const initialForm: ChallengeForm = {
-  title: '',
-  category: '',
-  difficulty: '',
-  reminderTime: '',
-  startDate: getTodayDate(),
-  frequency: '',
-}
-
 const categories: ChallengeCategory[] = [
   'Rozwój',
   'Zdrowie',
@@ -47,6 +38,7 @@ const categories: ChallengeCategory[] = [
 ]
 
 const difficulties = ['Łatwy', 'Średni', 'Trudny']
+
 export default function AddChallengePage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -55,8 +47,12 @@ export default function AddChallengePage() {
     ? dateFromUrl
     : getTodayDate()
   const [form, setForm] = useState<ChallengeForm>({
-    ...initialForm,
+    title: '',
+    category: '',
+    difficulty: '',
+    reminderTime: '',
     startDate: initialStartDate,
+    frequency: '',
   })
   const [errors, setErrors] = useState<ChallengeErrors>({})
   const [successMessage, setSuccessMessage] = useState('')
@@ -64,49 +60,42 @@ export default function AddChallengePage() {
 
   const availableFrequencies = getAvailableFrequencies(form.startDate)
 
-  useEffect(() => {
-    if (!isValidDateParam(dateFromUrl)) {
-      return
-    }
-
-    setForm((currentForm) =>
-      currentForm.startDate === dateFromUrl
-        ? currentForm
-        : {
-            ...currentForm,
-            startDate: dateFromUrl,
-          },
-    )
-  }, [dateFromUrl])
-
-  useEffect(() => {
-    if (!form.frequency) {
-      return
-    }
-
-    if (availableFrequencies.includes(form.frequency as ChallengeFrequency)) {
-      return
-    }
-
-    setForm((currentForm) => ({
-      ...currentForm,
-      frequency: '',
-    }))
-    setFrequencyNeedsReselect(true)
-
-    if (errors.frequency) {
-      setErrors((currentErrors) => ({
-        ...currentErrors,
-        frequency: undefined,
-      }))
-    }
-  }, [availableFrequencies, errors.frequency, form.frequency])
-
   const updateField = (field: keyof ChallengeForm, value: string) => {
-    setForm((currentForm) => ({
-      ...currentForm,
-      [field]: value,
-    }))
+    setForm((currentForm) => {
+      if (field !== 'startDate') {
+        return {
+          ...currentForm,
+          [field]: value,
+        }
+      }
+
+      const nextAvailableFrequencies = getAvailableFrequencies(value)
+      const shouldResetFrequency =
+        currentForm.frequency !== '' &&
+        !nextAvailableFrequencies.includes(
+          currentForm.frequency as ChallengeFrequency,
+        )
+
+      if (shouldResetFrequency) {
+        setFrequencyNeedsReselect(true)
+
+        if (errors.frequency) {
+          setErrors((currentErrors) => ({
+            ...currentErrors,
+            frequency: undefined,
+          }))
+        }
+      } else {
+        setFrequencyNeedsReselect(false)
+      }
+
+      return {
+        ...currentForm,
+        startDate: value,
+        frequency: shouldResetFrequency ? '' : currentForm.frequency,
+      }
+    })
+
     setSuccessMessage('')
 
     if (field === 'frequency') {

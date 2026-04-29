@@ -43,9 +43,9 @@ export default function BottomNav({ activeItem }: BottomNavProps) {
   return (
     <nav
       aria-label="Główna nawigacja"
-      className="sticky bottom-0 z-20 border-t border-slate-200 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 shadow-[0_-10px_24px_rgba(15,23,42,0.06)] backdrop-blur"
+      className="fixed bottom-0 left-1/2 z-30 w-full max-w-[720px] -translate-x-1/2 border-t border-slate-200/70 bg-white/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.8rem)] pt-3 shadow-[0_-12px_28px_rgba(15,23,42,0.08)] backdrop-blur"
     >
-      <ul className="mx-auto grid w-full max-w-[430px] grid-cols-3">
+      <ul className="mx-auto grid w-full max-w-[430px] grid-cols-3 gap-2">
         {items.map((item) => {
           const Icon = item.icon
           const isActive =
@@ -55,10 +55,10 @@ export default function BottomNav({ activeItem }: BottomNavProps) {
             <li key={item.value}>
               <Link
                 aria-current={isActive ? 'page' : undefined}
-                className={`mx-auto flex min-h-14 w-20 flex-col items-center justify-center rounded-xl text-xs font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-100 ${
+                className={`mx-auto flex min-h-14 w-full flex-col items-center justify-center rounded-[18px] px-2 text-xs font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-100 ${
                   isActive
-                    ? 'text-blue-600'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-gradient-to-r from-violet-50 via-blue-50 to-cyan-50 text-blue-700 shadow-[0_10px_20px_rgba(59,130,246,0.10)]'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
                 }`}
                 to={item.to}
               >

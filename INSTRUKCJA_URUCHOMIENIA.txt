@@ -1,0 +1,45 @@
+Daily Challenge – instrukcja uruchomienia projektu
+
+Projekt został wykonany jako aplikacja React + TypeScript + Vite. Interfejs został przygotowany w podejściu mobile first.
+
+Zalecam uruchomienie aplikacji na telefonie, ponieważ projekt został zaprojektowany głównie jako aplikacja mobilna. 
+Widok na urządzeniu mobilnym najlepiej oddaje docelowy wygląd i sposób korzystania z interfejsu.
+
+Wymagania:
+Node.js
+npm
+
+Uruchomienie projektu:
+
+1. Przejść do folderu projektu:
+
+cd daily-challenge
+
+2. Zainstalować zależności:
+
+npm install
+
+3. Uruchomić aplikację:
+
+npm run dev
+
+Po uruchomieniu w terminalu pojawi się adres lokalny, np.:
+
+http://localhost:5173/
+
+Jeżeli port 5173 będzie zajęty, Vite automatycznie uruchomi aplikację na kolejnym wolnym porcie.
+
+Podgląd na telefonie:
+
+Aplikację można uruchomić na telefonie podłączonym do tej samej sieci lokalnej. 
+W terminalu po uruchomieniu projektu pojawi się adres Network, np.:
+
+http://192.168.1.89:5174/
+
+Ten adres należy otworzyć w przeglądarce telefonu.
+
+Informacje dodatkowe:
+
+Aplikacja nie wymaga backendu. Dane są symulowane i zapisywane lokalnie w localStorage przeglądarki.
+
+Logowanie i rejestracja mają charakter demonstracyjny. Po poprawnym uzupełnieniu formularza użytkownik przechodzi do głównego ekranu aplikacji.

@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Eye, EyeOff, Target } from 'lucide-react'
+import { Target } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
+import AuthCheckboxField from '../components/auth/AuthCheckboxField'
+import AuthPasswordField from '../components/auth/AuthPasswordField'
+import AuthTextField from '../components/auth/AuthTextField'
 
 type RegisterForm = {
   username: string
@@ -20,6 +23,8 @@ const initialForm: RegisterForm = {
   confirmPassword: '',
   acceptedTerms: false,
 }
+
+const PASSWORD_REQUIREMENTS = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -57,11 +62,16 @@ export default function RegisterPage() {
     }
 
     if (!form.password.trim()) {
-      nextErrors.password = 'Hasło jest wymagane'
+      nextErrors.password = 'Minimum 8 znaków / Wielka litera / Mała litera / Cyfra'
+    } else if (!PASSWORD_REQUIREMENTS.test(form.password)) {
+      nextErrors.password =
+        'Hasło musi mieć minimum 8 znaków, wielką i małą literę oraz cyfrę'
     }
 
     if (!form.confirmPassword.trim()) {
-      nextErrors.confirmPassword = 'Potwierdź hasło'
+      nextErrors.confirmPassword = 'Hasła muszą być takie same'
+    } else if (form.password !== form.confirmPassword) {
+      nextErrors.confirmPassword = 'Hasła muszą być takie same'
     }
 
     if (!form.acceptedTerms) {
@@ -89,7 +99,7 @@ export default function RegisterPage() {
   return (
     <main className="min-h-svh bg-emerald-50/60 px-5 py-10 text-slate-950 sm:py-14">
       <div className="mx-auto flex w-full max-w-[430px] flex-col items-center">
-        <section className="mb-9 flex flex-col items-center text-center">
+        <section className="mb-5 flex flex-col items-center text-center">
           <div
             aria-hidden="true"
             className="mb-6 flex h-[76px] w-[76px] items-center justify-center rounded-[24px] bg-emerald-500 text-white shadow-[0_18px_35px_rgba(16,185,129,0.26)]"
@@ -110,236 +120,70 @@ export default function RegisterPage() {
           noValidate
           onSubmit={handleSubmit}
         >
-          <div className="space-y-6">
-            <div>
-              <label
-                className="mb-3 block text-[15px] font-semibold text-slate-950"
-                htmlFor="username"
-              >
-                Nazwa użytkownika
-              </label>
-              <input
-                aria-describedby={
-                  errors.username ? 'username-error' : undefined
-                }
-                aria-invalid={Boolean(errors.username)}
-                autoComplete="username"
-                className={`h-14 w-full rounded-[18px] border bg-slate-50 px-4 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100 ${
-                  errors.username
-                    ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                    : 'border-slate-200'
-                }`}
-                id="username"
-                name="username"
-                onChange={(event) =>
-                  updateField('username', event.target.value)
-                }
-                placeholder="Twoja nazwa"
-                type="text"
-                value={form.username}
-              />
-              {errors.username ? (
-                <p
-                  className="mt-2 text-sm font-medium text-red-600"
-                  id="username-error"
-                >
-                  {errors.username}
-                </p>
-              ) : null}
-            </div>
+          <div className="space-y-3">
+            <AuthTextField
+              autoComplete="username"
+              error={errors.username}
+              id="username"
+              label="Nazwa użytkownika"
+              name="username"
+              onChange={(value) => updateField('username', value)}
+              placeholder="Twoja nazwa"
+              value={form.username}
+            />
 
-            <div>
-              <label
-                className="mb-3 block text-[15px] font-semibold text-slate-950"
-                htmlFor="email"
-              >
-                Email
-              </label>
-              <input
-                aria-describedby={errors.email ? 'email-error' : undefined}
-                aria-invalid={Boolean(errors.email)}
-                autoComplete="email"
-                className={`h-14 w-full rounded-[18px] border bg-slate-50 px-4 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100 ${
-                  errors.email
-                    ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                    : 'border-slate-200'
-                }`}
-                id="email"
-                inputMode="email"
-                name="email"
-                onChange={(event) => updateField('email', event.target.value)}
-                placeholder="twoj@email.com"
-                type="email"
-                value={form.email}
-              />
-              {errors.email ? (
-                <p
-                  className="mt-2 text-sm font-medium text-red-600"
-                  id="email-error"
-                >
-                  {errors.email}
-                </p>
-              ) : null}
-            </div>
+            <AuthTextField
+              autoComplete="email"
+              error={errors.email}
+              id="email"
+              inputMode="email"
+              label="Email"
+              name="email"
+              onChange={(value) => updateField('email', value)}
+              placeholder="twoj@email.com"
+              type="email"
+              value={form.email}
+            />
 
-            <div>
-              <label
-                className="mb-3 block text-[15px] font-semibold text-slate-950"
-                htmlFor="password"
-              >
-                Hasło
-              </label>
-              <div className="relative">
-                <input
-                  aria-describedby={
-                    errors.password ? 'password-error' : undefined
-                  }
-                  aria-invalid={Boolean(errors.password)}
-                  autoComplete="new-password"
-                  className={`h-14 w-full rounded-[18px] border bg-slate-50 px-4 pr-13 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100 ${
-                    errors.password
-                      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                      : 'border-slate-200'
-                  }`}
-                  id="password"
-                  name="password"
-                  onChange={(event) =>
-                    updateField('password', event.target.value)
-                  }
-                  placeholder="Minimum 6 znaków"
-                  type={showPassword ? 'text' : 'password'}
-                  value={form.password}
-                />
-                <button
-                  aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
-                  className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 transition hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
-                  onClick={() => setShowPassword((isVisible) => !isVisible)}
-                  type="button"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" strokeWidth={2.2} />
-                  ) : (
-                    <Eye className="h-5 w-5" strokeWidth={2.2} />
-                  )}
-                </button>
-              </div>
-              {errors.password ? (
-                <p
-                  className="mt-2 text-sm font-medium text-red-600"
-                  id="password-error"
-                >
-                  {errors.password}
-                </p>
-              ) : null}
-            </div>
+            <AuthPasswordField
+              autoComplete="new-password"
+              error={errors.password}
+              id="password"
+              isVisible={showPassword}
+              label="Hasło"
+              name="password"
+              onChange={(value) => updateField('password', value)}
+              onToggleVisibility={() => setShowPassword((isVisible) => !isVisible)}
+              placeholder="Minimum 8 znaków"
+              toggleHiddenLabel="Pokaż hasło"
+              toggleVisibleLabel="Ukryj hasło"
+              value={form.password}
+            />
 
-            <div>
-              <label
-                className="mb-3 block text-[15px] font-semibold text-slate-950"
-                htmlFor="confirm-password"
-              >
-                Potwierdź hasło
-              </label>
-              <div className="relative">
-                <input
-                  aria-describedby={
-                    errors.confirmPassword
-                      ? 'confirm-password-error'
-                      : undefined
-                  }
-                  aria-invalid={Boolean(errors.confirmPassword)}
-                  autoComplete="new-password"
-                  className={`h-14 w-full rounded-[18px] border bg-slate-50 px-4 pr-13 text-base text-slate-950 outline-none transition placeholder:text-slate-500 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-100 ${
-                    errors.confirmPassword
-                      ? 'border-red-400 focus:border-red-500 focus:ring-red-100'
-                      : 'border-slate-200'
-                  }`}
-                  id="confirm-password"
-                  name="confirmPassword"
-                  onChange={(event) =>
-                    updateField('confirmPassword', event.target.value)
-                  }
-                  placeholder="Powtórz hasło"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={form.confirmPassword}
-                />
-                <button
-                  aria-label={
-                    showConfirmPassword
-                      ? 'Ukryj potwierdzenie hasła'
-                      : 'Pokaż potwierdzenie hasła'
-                  }
-                  className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 transition hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
-                  onClick={() =>
-                    setShowConfirmPassword((isVisible) => !isVisible)
-                  }
-                  type="button"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5" strokeWidth={2.2} />
-                  ) : (
-                    <Eye className="h-5 w-5" strokeWidth={2.2} />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword ? (
-                <p
-                  className="mt-2 text-sm font-medium text-red-600"
-                  id="confirm-password-error"
-                >
-                  {errors.confirmPassword}
-                </p>
-              ) : null}
-            </div>
+            <AuthPasswordField
+              autoComplete="new-password"
+              error={errors.confirmPassword}
+              id="confirm-password"
+              isVisible={showConfirmPassword}
+              label="Potwierdź hasło"
+              name="confirmPassword"
+              onChange={(value) => updateField('confirmPassword', value)}
+              onToggleVisibility={() =>
+                setShowConfirmPassword((isVisible) => !isVisible)
+              }
+              placeholder="Powtórz hasło"
+              toggleHiddenLabel="Pokaż potwierdzenie hasła"
+              toggleVisibleLabel="Ukryj potwierdzenie hasła"
+              value={form.confirmPassword}
+            />
           </div>
 
-          <div className="mt-7">
-            <div className="flex items-start gap-3">
-              <input
-                aria-describedby={
-                  errors.acceptedTerms ? 'accepted-terms-error' : undefined
-                }
-                aria-invalid={Boolean(errors.acceptedTerms)}
-                checked={form.acceptedTerms}
-                className={`mt-0.5 h-5 w-5 shrink-0 rounded border text-emerald-600 accent-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-100 ${
-                  errors.acceptedTerms ? 'border-red-400' : 'border-slate-300'
-                }`}
-                id="accepted-terms"
-                name="acceptedTerms"
-                onChange={(event) =>
-                  updateField('acceptedTerms', event.target.checked)
-                }
-                type="checkbox"
-              />
-              <label
-                className="text-[15px] font-medium leading-6 text-slate-700"
-                htmlFor="accepted-terms"
-              >
-                Akceptuję{' '}
-                <a
-                  className="rounded font-semibold text-emerald-600 underline underline-offset-2 transition hover:text-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
-                  href="#regulamin"
-                >
-                  regulamin
-                </a>{' '}
-                i{' '}
-                <a
-                  className="rounded font-semibold text-emerald-600 underline underline-offset-2 transition hover:text-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-100"
-                  href="#polityka-prywatnosci"
-                >
-                  politykę prywatności
-                </a>
-              </label>
-            </div>
-            {errors.acceptedTerms ? (
-              <p
-                className="mt-2 pl-8 text-sm font-medium text-red-600"
-                id="accepted-terms-error"
-              >
-                {errors.acceptedTerms}
-              </p>
-            ) : null}
-          </div>
+          <AuthCheckboxField
+            checked={form.acceptedTerms}
+            error={errors.acceptedTerms}
+            id="accepted-terms"
+            onChange={(checked) => updateField('acceptedTerms', checked)}
+          />
 
           <button
             className="mt-7 flex h-14 w-full items-center justify-center rounded-[18px] bg-emerald-600 px-5 text-base font-semibold text-white shadow-[0_12px_24px_rgba(5,150,105,0.26)] transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200 active:translate-y-px"

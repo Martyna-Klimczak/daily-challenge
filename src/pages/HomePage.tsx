@@ -64,15 +64,6 @@ export default function HomePage() {
     saveChallenges(challenges)
   }, [challenges])
 
-  useEffect(() => {
-    if (!isValidDateParam(dateFromUrl)) {
-      return
-    }
-
-    setSelectedDate(dateFromUrl)
-    setVisibleWeekStartDate(getStartOfWeek(parseDate(dateFromUrl)))
-  }, [dateFromUrl])
-
   const isChallengeCompletedOnDate = (
     challengeId: string,
     dateString: string,
